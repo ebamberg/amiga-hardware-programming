@@ -27,11 +27,7 @@
 
     void Display::init(UWORD mode,bool interleaved) {
             custom = (struct Custom*)0xdff000;
-            bitplanes[0]=NULL;
-            bitplanes[1]=NULL;
-            bitplanes[2]=NULL;
-            bitplanes[3]=NULL;
-            bitplanes[4]=NULL;
+            bitplanes=NULL;
 
 	        originalActiView=GfxBase->ActiView; //store current view
             LoadView(0);
@@ -83,7 +79,7 @@
             
             UWORD bitplaneRegister=offsetof (struct Custom, bplpt[0]);
             for (int i=0;i<numberOfBitplanes;i++) {
-                cl->movePointer(bitplaneRegister, (ULONG) bitplanes[i]);
+                cl->movePointer(bitplaneRegister, (ULONG) bitplanes->getBitplanePointer(i) );
                 bitplaneRegister+=4;
             }
             if (colorPalette!=NULL) {
@@ -99,14 +95,7 @@
     }
 
     void Display::setBackgroundImage(UBYTE* image) {
-        int bitplanesize=widthInBytes*height;
-        for (int i=0;i<numberOfBitplanes;i++) {
-            if (!interleaved) {
-                bitplanes[i]=(UBYTE*)(image + bitplanesize * i);
-            } else {
-                bitplanes[i]=(UBYTE*)(image + (widthInBytes * i));
-            }
-        }
+        bitplanes=new Bitplanes(image,width,height,numberOfBitplanes);
     }
 
     void Display::setColorPalette(ColorPalette* palette) {
@@ -114,16 +103,8 @@
     }
 
    void Display::show () {
-       if (bitplanes[0]==NULL) {
-           bitplanes[0]=(UBYTE *)AllocMem( widthInBytes*height*numberOfBitplanes, MEMF_CHIP);
-           int bitplanesize=widthInBytes*height;
-           for (int i=1;i<numberOfBitplanes;i++) {
-            if (!interleaved) {
-                bitplanes[i]=(UBYTE*)(bitplanes[0] + bitplanesize * i);
-            } else {
-                bitplanes[i]=(UBYTE*)(bitplanes[0] + (widthInBytes * i));
-            }
-           }
+       if (bitplanes==NULL) {
+           bitplanes=new Bitplanes(width,height,numberOfBitplanes);
        }
 
         copperList=buildCopperList();
@@ -138,7 +119,7 @@
     }
 
     UBYTE* Display::getBitplanes() {
-        return (UBYTE*)bitplanes[0];
+        return bitplanes->getBitplanePointer(0);
     }
 
     bool Display::isPAL() {

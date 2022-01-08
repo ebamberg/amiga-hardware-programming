@@ -17,6 +17,7 @@
 #include <graphics/modeid.h>
 #include "Copper.h"
 #include "ColorPalette.h"
+#include "Bitplanes.h"
 
 #define MONOCHROME 0x0001<<12
 #define DEPTH_4_COLORS 0x0002<<12
@@ -35,7 +36,8 @@
 
 class Display {
 
-    UBYTE* bitplanes[5];
+//    UBYTE* bitplanes[5];
+    Bitplanes* bitplanes;
     UWORD modeid;
     ColorPalette* colorPalette;
 

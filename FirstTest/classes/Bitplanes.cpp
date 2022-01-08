@@ -14,6 +14,10 @@ Bitplanes::Bitplanes(UBYTE *bitplanes, int width, int height, int numberOfBitpla
     
 }
 
+UBYTE* Bitplanes::getBitplanePointer(int index) {
+    return bitplanes[index];
+}
+
 void Bitplanes::setBitplanePointers(UBYTE* mem) {
     int bitplanesize=widthInBytes*height;
         for (int i=0;i<numberOfBitplanes;i++) {

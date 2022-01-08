@@ -10,8 +10,10 @@ class Bitplanes : public Viewport {
 
     protected:
         void setBitplanePointers(UBYTE* mem);
+        
     public:
         Bitplanes(int width, int height, int numberOfBitplanes);
         Bitplanes(UBYTE *,int width, int height, int numberOfBitplanes);
-
+        UBYTE* getBitplanePointer(int index);
+ 
 };

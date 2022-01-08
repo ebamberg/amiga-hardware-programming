@@ -1,0 +1,119 @@
+#include "../support/gcc8_c_support.h"
+#include <hardware/custom.h>
+
+#include <proto/graphics.h>
+#include <hardware/custom.h>
+#include <proto/graphics.h>
+#include <graphics/gfxbase.h>
+#include <proto/exec.h>
+
+// ifndef COPPER_CPP_
+// #define COPPER_CPP_
+
+
+
+class CopperList {
+    friend class Copper;
+
+    USHORT* copperList;
+    USHORT* copPointer;
+
+    CopperList() {
+        copperList= (USHORT*)AllocMem(1024, MEMF_CHIP);
+        copPointer=copperList;  // sets pointer to start of list;
+    }
+
+
+     void setEndOfList() {
+        *copPointer=0xffff;
+        *(copPointer+2)=0xfffe;
+    }
+
+    ULONG getCopperListPointer() {
+        return (ULONG) copperList;
+    }
+
+    
+
+    public:
+
+        static CopperList* create() {
+            return new CopperList();
+        }
+
+        CopperList* move(UWORD customRegister, UWORD value) {
+            *copPointer++=customRegister & 0xfffe; // ensure bit 0 is cleared, this indicates the word as a Copper Mov
+            *copPointer++=value;
+            setEndOfList();
+            return this;
+        }
+
+         CopperList* wait(UWORD ypos, UWORD xpos) {
+             *copPointer++= ( (ypos<<8) | ( (xpos & 0x7f<<1)) ) | 0x1; // ensure bit 0 is set, this indicates the word as a Copper Wait
+             *copPointer++= 0xfffe;
+            setEndOfList();
+            return this;
+         }
+
+          CopperList* wait(UWORD ypos) {
+             *copPointer++= (ypos<<8 | 0x07) & 0xffff; // ensure bit 0 is set, this indicates the word as a Copper Wait
+             *copPointer++= 0xff00;
+            setEndOfList();
+            return this;
+         }
+
+         CopperList* backgroundColor(UWORD value) {
+            *copPointer++=COLOR00 & 0xfffe; // ensure bit 0 is cleared, this indicates the word as a Copper Mov
+            *copPointer++=value;
+            setEndOfList();
+            return this;
+        }
+
+
+};
+
+
+class Copper {
+
+    volatile struct Custom *custom;
+
+    static Copper *singleton;
+
+    Copper() {
+        custom = (struct Custom*)0xdff000;
+    };
+
+    ~Copper() {
+        WaitTOF();
+        WaitTOF();
+        custom->cop1lc = (ULONG) ((struct GfxBase *)GfxBase)->copinit;
+    }
+
+    public:
+
+        static Copper* instance(){
+            if (singleton==NULL) {
+                singleton=new Copper;
+            }
+            return singleton;
+        };
+
+        static void destroy() {
+            if (singleton!=NULL) {
+                KPrintF("free resources for Copper Singleton");
+                delete singleton;
+            }
+        };
+
+        void useCopperList(ULONG copperList) {
+            custom->cop1lc = copperList;
+        };
+
+        void useCopperList(CopperList* copperList) {
+            custom->cop1lc = copperList->getCopperListPointer();
+        };
+
+ 
+};
+
+// #endif // COPPER_CPP_

@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "amiga",
+            "request": "launch",
+            "preLaunchTask": "compile",
+            "name": "Amiga 500",
+            "config": "A500",
+            "program": "${workspaceFolder}/a.mingw",
+            "kickstart": "C:/games/RetroGames/EmulationStation/emulators/commodore/winuae/roms/Kickstart1.3.rom",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "amiga",
+            "request": "launch",
+            "preLaunchTask": "compile",
+            "name": "Amiga 1200",
+            "config": "A1200",
+            "program": "${workspaceFolder}/a.mingw",
+            "kickstart": "C:/games/RetroGames/EmulationStation/emulators/commodore/winuae/roms/Kickstart-v3.1-rev-40.68-1993-Commodore-A1200.rom",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "amiga",
+            "request": "launch",
+            "preLaunchTask": "compile",
+            "name": "Amiga 4000",
+            "config": "A4000",
+            "program": "${workspaceFolder}/a.mingw",
+            "kickstart": "C:/games/RetroGames/EmulationStation/emulators/commodore/winuae/roms/Kickstart-v3.1-rev-40.68-1993-Commodore-A1200.rom",
+            "internalConsoleOptions": "openOnSessionStart"
+        }        
+    ]
+}
